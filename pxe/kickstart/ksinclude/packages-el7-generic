@@ -1,0 +1,126 @@
+@core
+
+
+# base
+bind-utils
+acpid
+adcli
+bzip2
+ethtool
+irqbalance
+libaio
+lvm2
+logwatch
+lsof
+man-pages
+man-pages-overrides
+mailx
+mtr
+nano
+net-tools
+openssh-clients
+ntp
+ntpdate
+time
+tcsh
+traceroute
+realmd
+usbutils
+vim-enhanced
+wget
+which
+teamd
+yum-utils
+zip
+zsh
+sysstat
+rsync
+subversion
+xfsdump
+xfsprogs
+salt-minion
+
+
+#SELinux
+#setroubleshoot-server
+#policycoreutils-python
+
+
+# SSSD stuff
+samba-common
+oddjob
+oddjob-mkhomedir
+sssd
+krb5-pkinit
+krb5-workstation
+
+# console-internet
+ftp
+lftp
+
+
+# directory-client
+sssd
+
+
+# legacy-unix
+telnet
+
+
+# network-file-system-client
+autofs
+nfs-utils
+nfs4-acl-tools
+
+
+# performance
+iotop
+iptraf
+
+
+# perl-runtime
+perl
+
+
+# system-admin-tools
+screen
+lsof
+ipmitool
+
+
+# system-management-snmp
+net-snmp
+net-snmp-utils
+
+
+# mail-server
+-sendmail
+postfix
+
+
+# Disable firmware and shit
+-iwl100-firmware.noarch
+-iwl1000-firmware.noarch
+-iwl105-firmware.noarch
+-iwl135-firmware.noarch
+-iwl2000-firmware.noarch
+-iwl2030-firmware.noarch
+-iwl3160-firmware.noarch
+-iwl3945-firmware.noarch
+-iwl4965-firmware.noarch
+-iwl5000-firmware.noarch
+-iwl5150-firmware.noarch
+-iwl6000-firmware.noarch
+-iwl6000g2a-firmware.noarch
+-iwl6000g2b-firmware.noarch
+-iwl6050-firmware.noarch
+-iwl7260-firmware.noarch
+
+
+# Don't install NetworkManager and associates
+-wpa_supplicant
+-NetworkManager
+-NetworkManager-tui
+-NetworkManager-team
+-ppp.x86_64
+-dnsmasq

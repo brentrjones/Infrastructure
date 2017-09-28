@@ -1,0 +1,17 @@
+cat << EOF >> /tmp/partinfo
+
+bootloader --location=mbr --driveorder=sda
+zerombr
+ignoredisk --only-use=sda
+clearpart --all
+part /boot --fstype ext4 --size=300 --ondisk=sda --fsoptions="nodev,nosuid,noexec"
+part swap --fstype=swap --size=2000 --ondisk=sda --fsoptions="barrier=0"
+part pv.01 --size=1 --grow --ondisk=sda
+volgroup vg01 pv.01
+logvol / --fstype ext4 --name=lv_root --vgname=vg01 --size=10000 --fsoptions="barrier=0,noatime"
+logvol /opt --fstype xfs --name=lv_opt --vgname=vg01 --size=4000 --fsoptions="nosuid,barrier=0,noatime,inode64,delaylog,logbufs=8,logbsize=256k"
+logvol /var --fstype xfs --name=lv_var --vgname=vg01 --size=2000 --grow --fsoptions="nodev,nosuid,barrier=0,noatime,inode64,delaylog,logbufs=8,logbsize=256k"
+logvol /var/log --fstype xfs --name=lv_var_log --vgname=vg01 --size=6000 --fsoptions="nodev,nosuid,barrier=0,noatime,inode64,delaylog,logbufs=8,logbsize=256k"
+logvol /tmp --fstype xfs --name=lv_tmp --vgname=vg01 --size=4000 --fsoptions="nodev,nosuid,barrier=0,noatime,inode64,delaylog,logbufs=8,logbsize=256k"
+
+EOF

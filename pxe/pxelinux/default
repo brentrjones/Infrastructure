@@ -1,0 +1,90 @@
+default vesamenu.c32
+prompt 0
+timeout 100
+
+#serial 0 9600 0xab3
+#SERIAL 0 115200
+
+MENU TITLE Enterprise PXE Menu
+MENU INCLUDE pxelinux.cfg/graphics.conf
+MENU AUTOBOOT Starting Local Boot in # seconds
+MENU BACKGROUND logo.png
+
+# Local boot
+label local
+  TEXT HELP
+  Boot from local hard drive
+  ENDTEXT
+  MENU LABEL ^Local Boot
+  localboot 0
+
+# Diagnostic Menu
+MENU BEGIN
+MENU LABEL ^Hardware provisioning and Diag
+MENU TITLE
+
+  label dtkcap
+    TEXT HELP
+    Dell Deployment Kit Capture
+    ENDTEXT
+    MENU LABEL ^Dell Deployment Kit
+    kernel dtk/isolinux/SA.1
+    append initrd=dtk/isolinux/SA.2 ramdisk_size=229441 root=/dev/ram0 rw DEBUG=0 share_type=cdrom ksdevice=em1 loglevel=1 BUILD=668 vmalloc=256M init=/init mem=15G selinux=0
+
+  label dtk-dellr730
+    TEXT HELP
+    DTK R730
+    ENDTEXT
+    MENU LABEL DTK R^730
+    kernel dtk/isolinux/SA.1
+    append initrd=dtk/isolinux/SA.2 ramdisk_size=229441 ksdevice=eth0 share_type=tftp share_location=el6/dtk/templates/ share_script=730-dtkrunall.sh tftp_ip=yourip
+
+  label Dell-Firmware-Update
+    MENU LABEL Dell Firmware-Update
+    kernel omsa-pxe/kernel.2.6.32-358.el6.x86_64
+    append initrd=omsa-pxe/initrd-vmxboot-rhel-05.4.x86_64-2.1.2.gz ramdisk_size=4500000 kiwiserver=10.6.1.17 
+    IPAPPEND 2
+
+  label centosrescue
+    MENU LABEL CentOS Rescue
+    kernel centos6/vmlinuz
+    append initrd=centos6/initrd.img ramdisk_size=10000 ksdevice=eth0 text rescue ks=http://rpmrepo/kickstart/pxe/pxe-rescue.ks
+
+  label hdt
+    TEXT HELP
+    Hardware Detection Tool
+    ENDTEXT
+    MENU LABEL ^Hardware Detection Tool
+    COM32 hdt.c32
+
+  label memtest
+    TEXT HELP
+    Memtestx86 Memory Diagnostics
+    ENDTEXT
+    MENU LABEL ^Memtest Diag
+    linux memtest.bin
+
+MENU END
+
+MENU SEPARATOR
+
+MENU BEGIN
+MENU TITLE Linux - Generic
+
+  label generic1
+    TEXT HELP
+    CentOS6
+    ENDTEXT
+    MENU LABEL CentOS 6
+    kernel centos6/vmlinuz
+    append initrd=centos6/initrd.img ksdevice=eth0 ks=http://rpmrepo/kickstart/pxe/pxe-el6-generic.ks
+
+  label centos7
+    TEXT HELP
+    CentOS 7
+    ENDTEXT
+    MENU LABEL CentOS 7
+    kernel centos7/vmlinuz
+    append initrd=centos7/initrd.img inst.ks=http://rpmrepo/kickstart/pxe/pxe-el7-generic.ks
+
+MENU END

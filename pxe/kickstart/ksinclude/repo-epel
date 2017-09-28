@@ -1,0 +1,6 @@
+[epel]
+name=epel
+baseurl=http://rpmrepo/mirror/epel/$releasever/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-$releasever

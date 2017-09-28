@@ -1,0 +1,11 @@
+[puppetlabs-products]
+name=Puppet Labs Products - $basearch
+baseurl=http://rpmrepo/mirror/puppet/el/$releasever/products/$basearch
+enabled=1
+gpgcheck=0
+
+[puppetlabs-deps]
+name=Puppet Labs Dependencies - $basearch
+baseurl=http://yum.puppetlabs.com/el/$releasever/dependencies/$basearch
+enabled=1
+gpgcheck=0

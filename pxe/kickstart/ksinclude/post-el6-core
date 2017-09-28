@@ -1,0 +1,78 @@
+# Disable splash screen boot, disable console blank
+sed -i -e's/ rhgb/ consoleblank=0/g' -e's/ quiet/ consoleblank=0/g' /boot/grub/grub.conf
+
+
+# Set SELinux to permissive
+sed -i -e 's/\(^SELINUX=\).*$/\1disabled/' /etc/selinux/config
+
+
+# Fix up partitions to be more secure
+FSTAB=/etc/fstab
+
+
+# Fix /var/tmp to use /tmp
+grep " \/var\/tmp " ${FSTAB} >/dev/null
+if [ $? -eq 1 ]; then
+        echo -e "/tmp\t\t/var/tmp\t\t\text4\tdefaults,bind,nodev,nosuid\t0 0" >> ${FSTAB}
+fi
+
+
+# Secure /dev/shm
+TEST="`grep ' \/dev\/shm ' ${FSTAB} | grep -c 'noexec'`"
+if [ "$TEST" = "0" ]; then
+        MNT_OPTS=$(grep " \/dev\/shm " ${FSTAB} | awk '{print $4}')
+        sed -i "s/\( \/dev\/shm.*${MNT_OPTS}\)/\1,nodev,noexec,nosuid/" ${FSTAB}
+fi
+
+
+# Enable eth1 if available
+dmesg | grep -l eth1
+if [ $? -eq 0 ]; then
+    sed -i -e's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth1
+fi
+
+
+# Disable Postfix service by default
+#chkconfig postfix off
+
+
+# Sync system time before next boot
+/usr/sbin/ntpdate ntp
+/sbin/hwclock --systohc
+
+
+# Remove TUV repos
+rm -f /etc/yum.repos.d/CentOS*
+
+
+# CentOS internal repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-base -O /etc/yum.repos.d/CentOS-Base.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-updates -O /etc/yum.repos.d/CentOS-Updates.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-fasttrack -O /etc/yum.repos.d/CentOS-Fasttrack.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-extras -O /etc/yum.repos.d/CentOS-Extras.repo
+
+
+# Internal Repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/post-repo-internal -O /etc/yum.repos.d/internal-common.repo
+
+
+# Puppet Repo (internal)
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-puppetos -O /etc/yum.repos.d/puppetlabs.repo
+
+
+# Install and setup LLDP
+yum install lldpad -y
+chkconfig lldpad on ; service lldpad start
+
+lldptool set-lldp adminStatus=rxtx
+lldptool -T -V sysName enableTx=yes
+lldptool -T -V portDesc enableTx=yes
+lldptool -T -V sysDesc enableTx=yes
+
+
+# Do updates
+yum -y -c /etc/yum.repos.d/CentOS-Base.repo update
+
+cat /dev/null > /etc/yum.repos.d/CentOS-Media.repo
+cat /dev/null > /etc/yum.repos.d/CentOS-Vault.repo
+cat /dev/null > /etc/yum.repos.d/CentOS-Debuginfo.repo

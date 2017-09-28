@@ -1,0 +1,87 @@
+-@ server-platform
+@core
+
+
+# base
+authconfig
+bind-utils
+acpid
+bzip2
+ethtool
+cpuspeed
+irqbalance
+libaio
+lvm2
+lsof
+man-pages
+man-pages-overrides
+mailx
+mtr
+nano
+openssh-clients
+readahead
+ntp
+ntpdate
+time
+tcsh
+traceroute
+usbutils
+vim-enhanced
+wget
+which
+yum-utils
+zip
+zsh
+sysstat
+rsync
+subversion
+xfsdump
+xfsprogs
+
+#SELinux
+#setroubleshoot-server
+#policycoreutils-python
+
+
+# console-internet
+jwhois
+ftp
+lftp
+
+
+# directory-client
+sssd
+
+
+# legacy-unix
+telnet
+
+
+# network-file-system-client
+autofs
+nfs-utils
+nfs4-acl-tools
+
+
+# performance
+iotop
+iptraf
+
+# perl-runtime
+perl
+
+
+# system-admin-tools
+screen
+lsof
+ipmitool
+
+# system-management-snmp
+net-snmp
+net-snmp-utils
+
+
+# mail-server
+-sendmail
+-postfix
+exim

@@ -1,0 +1,41 @@
+# Disable splash screen boot, disable console blank
+sed -i -e 's/ rhgb quiet//g' /boot/grub2/grub.cfg
+sed -i '/linux16/ s/$/ consoleblank=0/' /boot/grub2/grub.cfg
+
+# Set SELinux to permissive
+sed -i -e 's/\(^SELINUX=\).*$/\1disabled/' /etc/selinux/config
+
+
+# Sync system time before next boot
+/usr/sbin/ntpdate ntp
+/sbin/hwclock --systohc
+
+
+# Remove TUV repos
+rm -f /etc/yum.repos.d/CentOS*
+
+
+# CentOS internal repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-base -O /etc/yum.repos.d/CentOS-Base.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-updates -O /etc/yum.repos.d/CentOS-Updates.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-fasttrack -O /etc/yum.repos.d/CentOS-Fasttrack.repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-centos-extras -O /etc/yum.repos.d/CentOS-Extras.repo
+
+
+# Internal Repo
+wget --quiet http://rpmrepo/kickstart/ksinclude/post-repo-internal -O /etc/yum.repos.d/internal-common.repo
+
+# Puppet Repo (internal)
+wget --quiet http://rpmrepo/kickstart/ksinclude/repo-puppetos -O /etc/yum.repos.d/puppetlabs.repo
+
+# Install and setup LLDP
+yum install lldpad -y
+systemctl enable lldpad ; systemctl start lldpad
+
+lldptool set-lldp adminStatus=rxtx
+lldptool -T -V sysName enableTx=yes
+lldptool -T -V portDesc enableTx=yes
+lldptool -T -V sysDesc enableTx=yes
+
+
+yum -y -c /etc/yum.repos.d/CentOS-Base.repo update
