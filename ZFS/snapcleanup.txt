@@ -1,0 +1,67 @@
+#!/usr/bin/bash
+
+# retention variables
+ZPOOL='yourpool'
+SECSTOKEEP=259200 # 2592000 = 30 days, 1296000 = 15 days, 259200 = 3 days
+NOW=`/usr/bin/truss /usr/bin/date 2>&1 |  nawk -F= '/^time\(\)/ {gsub(/ /,"",$2);print $2}'`
+LZFS="/sbin/zfs"
+
+replconfirmed="replication:confirmed"
+repldepend="replication:depend"
+
+for POOL in $ZPOOL; do
+   echo $POOL
+   echo
+
+   if [ `zpool list | grep -c "^$POOL"` -gt 0 ]; then
+
+      # check if zpool is scrubbing
+      [ `zpool status -v $POOL | grep -c 'scrub in progress'` -gt 0 ] && \
+         echo Scrub in progress on $POOL, stop && \
+         echo Abort $POOL && \
+         continue
+
+      # print snapshot info
+      echo Snapshot statistics
+      zfs get -rHp used $(zpool list -H -o name $POOL ) |\
+      nawk '/@/ && $2 == "used" { tot++; total_space+=$3 ;\
+         if ( $3 == 0 ) { empty++ }} \
+      END { printf("%d snapshots\n%d empty snapshots\n%2.2f G in %d snapshots\n", tot, \
+         empty, total_space/(1024^3), tot - empty ) }'
+      echo
+
+      # clean up old snapshots
+      echo Cleaning up snapshots older than $SECSTOKEEP seconds.
+      DEPRICATED=0
+      for fs in `zfs list -t snapshot -o name | awk '!/NAME/ && !/no datasets availible/' | grep "^$POOL[@zfs-auto-snap:frequent/]"`; do
+         CREATED=`/usr/sbin/zfs get -Hpo value creation $fs`
+         DELTA=$((NOW - CREATED))
+         replconfirmcheck=`$LZFS get -H $replconfirmed $fs | cut -f3`
+         repldependcheck=`$LZFS get -H $repldepend $fs | cut -f3`
+         if [ $DELTA -gt $SECSTOKEEP ]; then
+            echo $fs was created at $CREATED which was $DELTA seconds ago.
+                                if [[ $repldependcheck = "false" && $replconfirmcheck = "true" ]];then
+                                echo Depend = $repldependcheck : Replicated = $replconfirmcheck, Destroying
+                                zfs destroy $fs
+                                let DEPRICATED+=1
+                                fi
+         fi
+      done
+      echo Done cleaning up snapshots. $DEPRICATED snapshots removed.
+      echo
+
+      # print snapshot info
+      echo Snapshot statistics
+      zfs get -rHp used $(zpool list -H -o name $POOL ) |\
+      nawk '/@/ && $2 == "used" { tot++; total_space+=$3 ;\
+         if ( $3 == 0 ) { empty++ }} \
+      END { printf("%d snapshots\n%d empty snapshots\n%2.2f G in %d snapshots\n", tot, \
+         empty, total_space/(1024^3), tot - empty ) }'
+   else
+      echo zpool $POOL not found, skipping
+   fi
+
+   echo
+   echo Finished $POOL
+   echo
+done
