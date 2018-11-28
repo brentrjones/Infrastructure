@@ -20,7 +20,7 @@
  <Attribute Name="ThermalConfig.1#CriticalEventGenerationInterval">30</Attribute>
  <Attribute Name="ThermalConfig.1#EventGenerationInterval">30</Attribute>
  <Attribute Name="ThermalSettings.1#ThermalProfile">Minimum Power</Attribute>
- <Attribute Name="ThermalSettings.1#AirExhaustTemp">50</Attribute>
+ <Attribute Name="ThermalSettings.1#AirExhaustTemp">52</Attribute>
  <Attribute Name="ThermalSettings.1#FanSpeedOffset">Off</Attribute>
  <Attribute Name="ThermalSettings.1#MinimumFanSpeed">255</Attribute>
  <Attribute Name="ServerPwr.1#PowerCapSetting">Disabled</Attribute>
